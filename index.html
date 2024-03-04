@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="pictureGalleryApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Dog Picture Gallery</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .navbar {
+            overflow-x: auto;
+            white-space: nowrap;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+
+        .navbar img {
+            width: 80px;
+            display: inline-block;
+            margin: 0 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .navbar img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .big-picture {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .big-picture img {
+            width: 90%;
+            max-width: 1080px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body ng-controller="PictureGalleryController">
+
+    <div class="navbar">
+        <img ng-repeat="image in images" ng-src="{{image}}" ng-click="selectImage(image)" alt="Cute Dog Thumbnail">
+    </div>
+
+    <div class="controls">
+        <button ng-click="prevImage()" ng-disabled="isFirstImage()">Prev</button>
+        <button ng-click="nextImage()" ng-disabled="isLastImage()">Next</button>
+    </div>
+
+    <div class="big-picture">
+        <img ng-src="{{selectedImage}}" alt="Selected Cute Dog Image">
+    </div>
+
+    <script>
+        angular.module('pictureGalleryApp', [])
+            .controller('PictureGalleryController', ['$scope', '$http', function ($scope, $http) {
+                $scope.images = [];
+                $scope.selectedImage = {};
+
+                $scope.fetchImages = function () {
+                    const url = 'https://dog.ceo/api/breeds/image/random/10'; // Fetching 10 random cute dog images
+                    $http.get(url).then(function (response) {
+                        $scope.images = response.data.message;
+                        $scope.selectedImage = $scope.images[0]; // Select the first cute dog image by default
+                    });
+                };
+
+                $scope.selectImage = function (image) {
+                    $scope.selectedImage = image;
+                };
+
+                $scope.nextImage = function () {
+                    let currentIndex = $scope.images.indexOf($scope.selectedImage);
+                    if (currentIndex < $scope.images.length - 1) {
+                        $scope.selectImage($scope.images[currentIndex + 1]);
+                    }
+                };
+
+                $scope.prevImage = function () {
+                    let currentIndex = $scope.images.indexOf($scope.selectedImage);
+                    if (currentIndex > 0) {
+                        $scope.selectImage($scope.images[currentIndex - 1]);
+                    }
+                };
+
+                $scope.isFirstImage = function () {
+                    return $scope.images.indexOf($scope.selectedImage) === 0;
+                };
+
+                $scope.isLastImage = function () {
+                    return $scope.images.indexOf($scope.selectedImage) === $scope.images.length - 1;
+                };
+
+                // Initial fetch of cute dog images
+                $scope.fetchImages();
+            }]);
+    </script>
+
+</body>
+
+</html>
